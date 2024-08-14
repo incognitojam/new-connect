@@ -1,5 +1,5 @@
 import { type BrowserContext, chromium, devices } from 'playwright'
-import { createServer, ViteDevServer } from 'vite'
+import { createServer, type ViteDevServer } from 'vite'
 
 
 const OUT_DIR = process.argv[3] ?? 'screenshots'
