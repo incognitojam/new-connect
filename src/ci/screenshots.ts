@@ -15,6 +15,7 @@ async function takeScreenshots(baseUrl: string, deviceType: string, context: Bro
   await page.goto(baseUrl)
   await page.click('button:has-text(\'Try the demo\')')
   for await (const [route, path] of Object.entries(ROUTES)) {
+    // Wait for network to be idle before taking screenshot
     await page.goto(`${baseUrl}/${path}`, { waitUntil: 'networkidle' })
     await page.screenshot({path: `${OUT_DIR}/${route}-${deviceType}.playwright.png`})
     console.log(`${route}-${deviceType}.playwright.png`)
@@ -23,6 +24,7 @@ async function takeScreenshots(baseUrl: string, deviceType: string, context: Bro
 }
 
 async function main() {
+  // Run local server if no URL provided
   let baseUrl = process.argv[2]
   let server: ViteDevServer | undefined
   if (!baseUrl) {
@@ -34,6 +36,7 @@ async function main() {
 
   const browser = await chromium.launch({ headless: true })
 
+  // Take screenshots for mobile and desktop in parallel
   async function mobile() {
     const mobile = await browser.newContext(devices['iPhone 13'])
     await takeScreenshots(baseUrl, 'mobile', mobile)
