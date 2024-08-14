@@ -7,11 +7,11 @@ const endpoints = {
   Login: 'login',
   RouteList: '1d3dc3e03047b0c7',
   RouteActivity: '1d3dc3e03047b0c7/000000dd--455f14369d',
-  SettingsActivity: '1d3dc3e03047b0c7/000000dd--455f14369d/settings',
+  SettingsActivity: '1d3dc3e03047b0c7/settings',
 };
 
 async function takeScreenshots(deviceType, context) {
-  let page = await context.newPage()
+  const page = await context.newPage()
   await page.goto(`${base_url}`)
   await page.click(`button:has-text('Try the demo')`)
   for (const endpoint in endpoints) {
@@ -24,14 +24,14 @@ async function takeScreenshots(deviceType, context) {
 }
 
 (async () => {
-  const mobile_browser = await chromium.launch({ executablePath: "/usr/bin/chromium"})
+  const browser = await chromium.launch()
   const iphone_13 = devices['iPhone 13']
-  const mobile_context = await mobile_browser.newContext(iphone_13)
+  const mobile_context = await browser.newContext(iphone_13)
   await takeScreenshots('mobile', mobile_context)
-  await mobile_browser.close()
+  await mobile_context.close()
 
-  const desktop_browser = await chromium.launch({ executablePath: "/usr/bin/chromium"})
-  const desktop_context = await desktop_browser.newContext({viewport: { width: 1920, height: 1080 }})
+  const desktop_context = await browser.newContext({viewport: { width: 1920, height: 1080 }})
   await takeScreenshots('desktop', desktop_context)
-  await desktop_browser.close()
+  await desktop_context.close();
+  await browser.close()
 })()
