@@ -33,7 +33,7 @@ jobs:
                 title: 'Preview deployment',
                 summary: 'In Progress',
               },
-              owner: 'commaai',
+              owner: '${{ github.repository_owner }}',
               repo: '${{ github.event.repository.name }}',
             })
             return response.data.id
@@ -72,12 +72,12 @@ jobs:
         with:
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           apiToken: ${{ secrets.CLOUDFLARE_PAGES_TOKEN }}
-          command: pages deploy dist --project-name=connect --branch=${{ steps.pr.outputs.result }} --commit-dirty=true
+          command: pages deploy dist --project-name=${{ secrets.CLOUDFLARE_PAGES_PROJECT }} --branch=${{ steps.pr.outputs.result }} --commit-dirty=true
 
       - name: Checkout ci-artifacts
         uses: actions/checkout@v4
         with:
-          repository: commaai/ci-artifacts
+          repository: ${{ github.repository_owner }}/ci-artifacts
           ssh-key: ${{ secrets.CI_ARTIFACTS_DEPLOY_KEY }}
           path: ${{ github.workspace }}/ci-artifacts
           ref: master
@@ -85,7 +85,7 @@ jobs:
       - name: take screenshots
         run: |
           bun install --frozen-lockfile
-          node src/ci/screenshots.cjs https://${{ steps.pr.outputs.result }}.connect-d5y.pages.dev ${{ github.workspace }}/ci-artifacts
+          node src/ci/screenshots.cjs https://${{ steps.pr.outputs.result }}.${{ secrets.CLOUDFLARE_PAGES_HOSTNAME }} ${{ github.workspace }}/ci-artifacts
 
       - name: Push Screenshots
         working-directory: ${{ github.workspace }}/ci-artifacts
@@ -103,7 +103,7 @@ jobs:
           message: |
             <!-- _(run_id **${{ github.run_id }}**)_ -->
 
-            # deployed preview: https://${{ steps.pr.outputs.result }}.connect-d5y.pages.dev
+            # deployed preview: https://${{ steps.pr.outputs.result }}.${{ secrets.CLOUDFLARE_PAGES_HOSTNAME }}
 
             Welcome to new-connect! Make sure to:
             * read the [contributing guidelines](https://github.com/commaai/new-connect?tab=readme-ov-file#contributing)
@@ -113,24 +113,24 @@ jobs:
             ### Mobile
             <table>
               <tr>
-                <td><img src="https://raw.githubusercontent.com/commaai/ci-artifacts/new-connect/pr-${{ steps.pr.outputs.result }}/Login-mobile.playwright.png"></td>
-                <td><img src="https://raw.githubusercontent.com/commaai/ci-artifacts/new-connect/pr-${{ steps.pr.outputs.result }}/RouteActivity-mobile.playwright.png"></td>
+                <td><img src="https://raw.githubusercontent.com/${{ github.repository_owner }}/ci-artifacts/new-connect/pr-${{ steps.pr.outputs.result }}/Login-mobile.playwright.png"></td>
+                <td><img src="https://raw.githubusercontent.com/${{ github.repository_owner }}/ci-artifacts/new-connect/pr-${{ steps.pr.outputs.result }}/RouteActivity-mobile.playwright.png"></td>
               <tr/>
               <tr>
-                <td><img src="https://raw.githubusercontent.com/commaai/ci-artifacts/new-connect/pr-${{ steps.pr.outputs.result }}/RouteList-mobile.playwright.png"></td>
-                <td><img src="https://raw.githubusercontent.com/commaai/ci-artifacts/new-connect/pr-${{ steps.pr.outputs.result }}/SettingsActivity-mobile.playwright.png"></td>
+                <td><img src="https://raw.githubusercontent.com/${{ github.repository_owner }}/ci-artifacts/new-connect/pr-${{ steps.pr.outputs.result }}/RouteList-mobile.playwright.png"></td>
+                <td><img src="https://raw.githubusercontent.com/${{ github.repository_owner }}/ci-artifacts/new-connect/pr-${{ steps.pr.outputs.result }}/SettingsActivity-mobile.playwright.png"></td>
               </tr>
             </table>
 
             ### Desktop
             <table>
               <tr>
-                <img src="https://raw.githubusercontent.com/commaai/ci-artifacts/new-connect/pr-${{ steps.pr.outputs.result }}/Login-desktop.playwright.png">
-                <img src="https://raw.githubusercontent.com/commaai/ci-artifacts/new-connect/pr-${{ steps.pr.outputs.result }}/RouteActivity-desktop.playwright.png">
+                <img src="https://raw.githubusercontent.com/${{ github.repository_owner }}/ci-artifacts/new-connect/pr-${{ steps.pr.outputs.result }}/Login-desktop.playwright.png">
+                <img src="https://raw.githubusercontent.com/${{ github.repository_owner }}/ci-artifacts/new-connect/pr-${{ steps.pr.outputs.result }}/RouteActivity-desktop.playwright.png">
               </tr>
               <tr>
-                <img src="https://raw.githubusercontent.com/commaai/ci-artifacts/new-connect/pr-${{ steps.pr.outputs.result }}/RouteList-desktop.playwright.png">
-                <img src="https://raw.githubusercontent.com/commaai/ci-artifacts/new-connect/pr-${{ steps.pr.outputs.result }}/SettingsActivity-desktop.playwright.png">
+                <img src="https://raw.githubusercontent.com/${{ github.repository_owner }}/ci-artifacts/new-connect/pr-${{ steps.pr.outputs.result }}/RouteList-desktop.playwright.png">
+                <img src="https://raw.githubusercontent.com/${{ github.repository_owner }}/ci-artifacts/new-connect/pr-${{ steps.pr.outputs.result }}/SettingsActivity-desktop.playwright.png">
               </tr>
             </table>
           comment_tag: run_id
@@ -156,6 +156,6 @@ jobs:
               title: 'Preview deployment',
               summary: 'Result: ${{ needs.preview.result }}',
             },
-            owner: 'commaai',
+            owner: '${{ github.repository_owner }}',
             repo: '${{ github.event.repository.name }}',
           })
